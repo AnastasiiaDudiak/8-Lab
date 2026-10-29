@@ -1,0 +1,89 @@
+# Запит 1: SELECT з FILTER — події з понад 1000 загиблих
+PREFIX нс:      <http://example.org/emergency#>
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+
+SELECT ?подія ?загиблі
+WHERE {
+  ?e rdfs:label ?подія ;
+     нс:кількістьЗагиблих ?загиблі .
+  FILTER (?загиблі > 1000)
+}
+ORDER BY DESC(?загиблі)
+
+# ==========================================
+
+# Запит 2: SELECT з OPTIONAL — події з необов’язковими магнітудою та збитками
+PREFIX нс:      <http://example.org/emergency#>
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+
+SELECT ?подія ?магнітуда ?збитки
+WHERE {
+  ?e нс:відбуваєтьсяВ ?країна ;
+     rdfs:label ?подія .
+  OPTIONAL { ?e нс:магнітуда ?магнітуда }
+  OPTIONAL { ?e нс:збиткиТисUSD ?збитки }
+}
+ORDER BY ?подія
+
+# ==========================================
+
+# Запит 3: SELECT з агрегацією — події та загиблі за регіонами
+PREFIX нс:      <http://example.org/emergency#>
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+
+SELECT ?регіон (COUNT(?e) AS ?подій) (SUM(?загиблі) AS ?загиблих)
+WHERE {
+  ?e нс:відбуваєтьсяВ ?країна ;
+     нс:кількістьЗагиблих ?загиблі .
+  ?країна нс:розташованаВРегіоні ?р .
+  ?р rdfs:label ?регіон .
+}
+GROUP BY ?регіон
+ORDER BY DESC(?загиблих)
+
+# ==========================================
+
+# Запит 4: SELECT для виведення — природні катастрофи (змінюється після увімкнення RDFS)
+PREFIX нс:      <http://example.org/emergency#>
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+
+SELECT ?подія
+WHERE {
+  ?e a нс:ПриродняКатастрофа ;
+     rdfs:label ?подія .
+}
+ORDER BY ?подія
+
+# ==========================================
+
+# Запит 5: ASK — перевірка обмеження: чи є подія, що відбулася у двох різних країнах
+PREFIX нс:      <http://example.org/emergency#>
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+
+ASK {
+  ?e нс:відбуваєтьсяВ ?к1 , ?к2 .
+  FILTER (?к1 != ?к2)
+}
+
+# ==========================================
+
+# Запит 6: CONSTRUCT — матеріалізація зворотного зв’язку «подія → сценарій»
+PREFIX нс:      <http://example.org/emergency#>
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+
+CONSTRUCT { ?e нс:реагуванняЗаСценарієм ?сценарій }
+WHERE {
+  ?сценарій нс:застосованоДляРеагуванняНа ?e .
+}

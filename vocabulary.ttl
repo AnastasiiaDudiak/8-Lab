@@ -1,0 +1,212 @@
+@prefix нс:      <http://example.org/emergency#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+
+<http://example.org/emergency> a owl:Ontology ;
+    rdfs:label "Словник управління надзвичайними ситуаціями (лабораторна 8)"@uk ;
+    rdfs:comment "Повторно використано словники SKOS, Dublin Core Terms (dcterms) і PROV-O."@uk .
+
+нс:НадзвичайнаПодія
+    a owl:Class ;
+    rdfs:label "Надзвичайна подія"@uk ;
+    rdfs:subClassOf prov:Entity .
+
+нс:ПриродняКатастрофа
+    a owl:Class ;
+    rdfs:label "Природна катастрофа"@uk ;
+    rdfs:subClassOf нс:НадзвичайнаПодія ;
+    owl:disjointWith нс:ТехногенняКатастрофа .
+
+нс:ТехногенняКатастрофа
+    a owl:Class ;
+    rdfs:label "Техногенна катастрофа"@uk ;
+    rdfs:subClassOf нс:НадзвичайнаПодія .
+
+нс:Землетрус
+    a owl:Class ;
+    rdfs:label "Землетрус"@uk ;
+    rdfs:subClassOf нс:ПриродняКатастрофа ;
+    owl:disjointWith нс:Повінь ;
+    owl:disjointWith нс:Шторм ;
+    owl:disjointWith нс:Епідемія ;
+    owl:disjointWith нс:ЛісоваПожежа .
+
+нс:Повінь
+    a owl:Class ;
+    rdfs:label "Повінь"@uk ;
+    rdfs:subClassOf нс:ПриродняКатастрофа ;
+    owl:disjointWith нс:Шторм ;
+    owl:disjointWith нс:Епідемія ;
+    owl:disjointWith нс:ЛісоваПожежа .
+
+нс:Шторм
+    a owl:Class ;
+    rdfs:label "Шторм"@uk ;
+    rdfs:subClassOf нс:ПриродняКатастрофа ;
+    owl:disjointWith нс:Епідемія ;
+    owl:disjointWith нс:ЛісоваПожежа .
+
+нс:Епідемія
+    a owl:Class ;
+    rdfs:label "Епідемія"@uk ;
+    rdfs:subClassOf нс:ПриродняКатастрофа ;
+    owl:disjointWith нс:ЛісоваПожежа .
+
+нс:ЛісоваПожежа
+    a owl:Class ;
+    rdfs:label "Лісова пожежа"@uk ;
+    rdfs:subClassOf нс:ПриродняКатастрофа .
+
+нс:ПромисловаАварія
+    a owl:Class ;
+    rdfs:label "Промислова аварія"@uk ;
+    rdfs:subClassOf нс:ТехногенняКатастрофа .
+
+нс:Країна
+    a owl:Class ;
+    rdfs:label "Країна"@uk .
+
+нс:Регіон
+    a owl:Class ;
+    rdfs:label "Регіон світу"@uk .
+
+нс:РівеньТяжкості
+    a owl:Class ;
+    rdfs:label "Рівень тяжкості"@uk ;
+    rdfs:subClassOf skos:Concept .
+
+нс:СценарійРеагування
+    a owl:Class ;
+    rdfs:label "Сценарій реагування"@uk .
+
+нс:СценарійЕвакуації
+    a owl:Class ;
+    rdfs:label "Сценарій евакуації"@uk ;
+    rdfs:subClassOf нс:СценарійРеагування ;
+    owl:disjointWith нс:ПошуковоРятувальнийСценарій ;
+    owl:disjointWith нс:МедичнийСценарій ;
+    owl:disjointWith нс:СценарійГасінняПожеж .
+
+нс:ПошуковоРятувальнийСценарій
+    a owl:Class ;
+    rdfs:label "Пошуково-рятувальний сценарій"@uk ;
+    rdfs:subClassOf нс:СценарійРеагування ;
+    owl:disjointWith нс:МедичнийСценарій ;
+    owl:disjointWith нс:СценарійГасінняПожеж .
+
+нс:МедичнийСценарій
+    a owl:Class ;
+    rdfs:label "Медичний сценарій"@uk ;
+    rdfs:subClassOf нс:СценарійРеагування ;
+    owl:disjointWith нс:СценарійГасінняПожеж .
+
+нс:СценарійГасінняПожеж
+    a owl:Class ;
+    rdfs:label "Сценарій гасіння пожеж"@uk ;
+    rdfs:subClassOf нс:СценарійРеагування .
+
+нс:СлужбаРеагування
+    a owl:Class ;
+    rdfs:label "Служба реагування"@uk .
+
+нс:відбуваєтьсяВ
+    a owl:ObjectProperty ;
+    rdfs:label "відбувається в країні"@uk ;
+    rdfs:domain нс:НадзвичайнаПодія ;
+    rdfs:range нс:Країна ;
+    a owl:FunctionalProperty .
+
+нс:розташованаВРегіоні
+    a owl:ObjectProperty ;
+    rdfs:label "розташована в регіоні"@uk ;
+    rdfs:domain нс:Країна ;
+    rdfs:range нс:Регіон ;
+    a owl:FunctionalProperty .
+
+нс:маєРівеньТяжкості
+    a owl:ObjectProperty ;
+    rdfs:label "має рівень тяжкості"@uk ;
+    rdfs:domain нс:НадзвичайнаПодія ;
+    rdfs:range нс:РівеньТяжкості ;
+    a owl:FunctionalProperty .
+
+нс:застосованоДляРеагуванняНа
+    a owl:ObjectProperty ;
+    rdfs:label "застосовано для реагування на"@uk ;
+    rdfs:domain нс:СценарійРеагування ;
+    rdfs:range нс:НадзвичайнаПодія ;
+    owl:inverseOf нс:реагуванняЗаСценарієм .
+
+нс:реагуванняЗаСценарієм
+    a owl:ObjectProperty ;
+    rdfs:label "реагування за сценарієм"@uk ;
+    rdfs:domain нс:НадзвичайнаПодія ;
+    rdfs:range нс:СценарійРеагування .
+
+нс:залучаєСлужбу
+    a owl:ObjectProperty ;
+    rdfs:label "залучає службу"@uk ;
+    rdfs:domain нс:СценарійРеагування ;
+    rdfs:range нс:СлужбаРеагування .
+
+нс:кодПодії
+    a owl:DatatypeProperty ;
+    a owl:FunctionalProperty ;
+    rdfs:label "код події EM-DAT"@uk ;
+    rdfs:domain нс:НадзвичайнаПодія ;
+    rdfs:range xsd:string .
+
+нс:місяцьПочатку
+    a owl:DatatypeProperty ;
+    a owl:FunctionalProperty ;
+    rdfs:label "місяць початку"@uk ;
+    rdfs:domain нс:НадзвичайнаПодія ;
+    rdfs:range xsd:integer .
+
+нс:кількістьЗагиблих
+    a owl:DatatypeProperty ;
+    a owl:FunctionalProperty ;
+    rdfs:label "кількість загиблих"@uk ;
+    rdfs:domain нс:НадзвичайнаПодія ;
+    rdfs:range xsd:integer .
+
+нс:кількістьПостраждалих
+    a owl:DatatypeProperty ;
+    a owl:FunctionalProperty ;
+    rdfs:label "кількість постраждалих"@uk ;
+    rdfs:domain нс:НадзвичайнаПодія ;
+    rdfs:range xsd:integer .
+
+нс:збиткиТисUSD
+    a owl:DatatypeProperty ;
+    a owl:FunctionalProperty ;
+    rdfs:label "збитки, тис. USD"@uk ;
+    rdfs:domain нс:НадзвичайнаПодія ;
+    rdfs:range xsd:decimal .
+
+нс:магнітуда
+    a owl:DatatypeProperty ;
+    a owl:FunctionalProperty ;
+    rdfs:label "магнітуда (Ріхтера)"@uk ;
+    rdfs:domain нс:Землетрус ;
+    rdfs:range xsd:decimal .
+
+нс:маєМіжнародніЗвернення
+    a owl:DatatypeProperty ;
+    a owl:FunctionalProperty ;
+    rdfs:label "є міжнародне звернення по допомогу"@uk ;
+    rdfs:domain нс:НадзвичайнаПодія ;
+    rdfs:range xsd:boolean .
+
+нс:кодISO
+    a owl:DatatypeProperty ;
+    a owl:FunctionalProperty ;
+    rdfs:label "ISO-код країни"@uk ;
+    rdfs:domain нс:Країна ;
+    rdfs:range xsd:string .
+

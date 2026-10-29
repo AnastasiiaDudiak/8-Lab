@@ -1,0 +1,56 @@
+PREFIX нс:      <http://example.org/emergency#>
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos:    <http://www.w3.org/2004/02/skos/core#>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX xsd:     <http://www.w3.org/2001/XMLSchema#>
+
+# Виконуйте контрольний запит ДО і ПІСЛЯ кожного оновлення (запити SELECT і UPDATE виконуються окремо).
+
+# Контроль до/після для UPDATE 1 — розподіл подій за рівнем тяжкості
+SELECT ?рівень (COUNT(?e) AS ?подій)
+WHERE {
+  ?e нс:маєРівеньТяжкості ?р .
+  ?р skos:prefLabel ?рівень .
+}
+GROUP BY ?рівень
+ORDER BY ?рівень
+
+# ==========================================
+
+# UPDATE 1 — INSERT WHERE: обчислити рівень тяжкості для подій, у яких його ще немає
+INSERT {
+  ?e нс:маєРівеньТяжкості ?рівень .
+}
+WHERE {
+  ?e нс:відбуваєтьсяВ ?країна .
+  FILTER NOT EXISTS { ?e нс:маєРівеньТяжкості ?вже }
+  OPTIONAL { ?e нс:кількістьЗагиблих ?з }
+  OPTIONAL { ?e нс:кількістьПостраждалих ?п }
+  OPTIONAL { ?e нс:збиткиТисUSD ?з2 }
+  BIND (COALESCE(?з, 0) AS ?ЗГ)
+  BIND (COALESCE(?п, 0) AS ?ПС)
+  BIND (COALESCE(?з2, 0) AS ?ЗБ)
+  BIND (IF(?ЗГ >= 1000 || ?ПС >= 5000000 || ?ЗБ >= 5000000, нс:Тяжкість_Високий,
+        IF(?ЗГ >= 100 || ?ПС >= 100000 || ?ЗБ >= 100000, нс:Тяжкість_Середній,
+           нс:Тяжкість_Низький)) AS ?рівень)
+}
+
+# ==========================================
+
+# Контроль до/після для UPDATE 2 — дати останнього оновлення записів
+SELECT ?дата (COUNT(?e) AS ?подій)
+WHERE {
+  ?e dcterms:modified ?дата .
+}
+GROUP BY ?дата
+ORDER BY ?дата
+
+# ==========================================
+
+# UPDATE 2 — DELETE/INSERT WHERE: оновити дату зміни записів (версійність)
+DELETE { ?e dcterms:modified ?стара }
+INSERT { ?e dcterms:modified "2026-10-29"^^xsd:date }
+WHERE {
+  ?e нс:відбуваєтьсяВ ?країна .
+  OPTIONAL { ?e dcterms:modified ?стара }
+}

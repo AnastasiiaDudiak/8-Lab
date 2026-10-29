@@ -1,0 +1,52 @@
+@prefix нс:   <http://example.org/emergency#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# Шаблон 1: кожна надзвичайна подія
+нс:ПодіяShape a sh:NodeShape ;
+    sh:targetClass нс:Землетрус , нс:Шторм , нс:Повінь , нс:Епідемія , нс:ЛісоваПожежа , нс:ПромисловаАварія ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:message "Подія повинна мати назву (rdfs:label)."@uk ] ;
+    sh:property [
+        sh:path нс:відбуваєтьсяВ ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class нс:Країна ;
+        sh:message "Подія повинна відбуватися рівно в одній країні."@uk ] ;
+    sh:property [
+        sh:path нс:кількістьЗагиблих ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:integer ;
+        sh:minInclusive 0 ;
+        sh:message "Кількість загиблих — одне невід’ємне ціле число."@uk ] .
+
+# Шаблон 2: країна
+нс:КраїнаShape a sh:NodeShape ;
+    sh:targetClass нс:Країна ;
+    sh:property [
+        sh:path rdfs:label ;
+        sh:minCount 1 ;
+        sh:message "Країна повинна мати назву."@uk ] ;
+    sh:property [
+        sh:path нс:кодISO ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:datatype xsd:string ;
+        sh:pattern "^[A-Z]{3}$" ;
+        sh:message "ISO-код країни — рівно три великі латинські літери."@uk ] ;
+    sh:property [
+        sh:path нс:розташованаВРегіоні ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:class нс:Регіон ;
+        sh:message "Країна повинна належати рівно одному регіону."@uk ] .
+
+# Шаблон 3: землетрус — діапазон магнітуди
+нс:ЗемлетрусShape a sh:NodeShape ;
+    sh:targetClass нс:Землетрус ;
+    sh:property [
+        sh:path нс:магнітуда ;
+        sh:maxCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:minInclusive 0 ; sh:maxInclusive 10 ;
+        sh:message "Магнітуда землетрусу — число від 0 до 10."@uk ] .
